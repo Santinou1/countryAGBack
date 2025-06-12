@@ -1,12 +1,24 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
+import { BoletosModule } from './boletos/boletos.module';
 import { LoggingModule } from './logging/logging.module';
+import { QrModule } from './qr/qr.module';
+import { databaseConfig } from './config/database.config';
 
 @Module({
-  imports: [UsersModule, LoggingModule],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    TypeOrmModule.forRoot(databaseConfig),
+    LoggingModule,
+    UsersModule,
+    BoletosModule,
+    QrModule
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
