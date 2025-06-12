@@ -139,4 +139,26 @@ export class UsersService implements OnModuleInit {
     }
     return user;
   }
+
+  async getMe(userId: number): Promise<User> {
+    this.logger.log(`Obteniendo información del usuario: ${userId}`, 'UsersService');
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    
+    if (!user) {
+      this.logger.error(`Usuario no encontrado: ${userId}`, undefined, 'UsersService');
+      throw new NotFoundException(`Usuario no encontrado`);
+    }
+
+    // Loguear la información completa del usuario
+    this.logger.log('Información del usuario:', 'UsersService');
+    this.logger.log(JSON.stringify({
+      id: user.id,
+      email: user.email,
+      nombre: user.nombre,
+      apellido: user.apellido,
+      rol: user.rol
+    }, null, 2), 'UsersService');
+
+    return user;
+  }
 }

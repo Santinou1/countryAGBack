@@ -10,9 +10,9 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(email: string, contraseña: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
-    if (user && password === user.contraseña) {
+    if (user && contraseña === user.contraseña) {
       const { contraseña, ...result } = user;
       return result;
     }
@@ -31,5 +31,22 @@ export class AuthService {
         apellido: user.apellido
       }
     };
+  }
+
+  async logout(userId: number) {
+    try {
+      // Aquí podrías agregar lógica adicional como:
+      // - Invalidar el token en una lista negra
+      // - Registrar la hora de cierre de sesión
+      // - Limpiar sesiones activas del usuario
+      
+      return {
+        message: 'Sesión cerrada exitosamente',
+        userId: userId,
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Error al cerrar sesión');
+    }
   }
 } 
