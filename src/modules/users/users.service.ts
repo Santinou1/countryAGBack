@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserRole } from './entities/user-role.enum';
-import { LoggingService } from '../logging/logging.service';
+import { LoggingService } from '../../logging/logging.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -128,5 +128,15 @@ export class UsersService implements OnModuleInit {
       throw new NotFoundException(errorMessage);
     }
     this.logger.log(`Usuario eliminado exitosamente: ${id}`, 'UsersService');
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    this.logger.log(`Buscando usuario por email: ${email}`, 'UsersService');
+    const user = await this.usersRepository.findOne({ where: { email } });
+    if (!user) {
+      this.logger.error(`Usuario con email ${email} no encontrado`, undefined, 'UsersService');
+      throw new NotFoundException(`Usuario con email ${email} no encontrado`);
+    }
+    return user;
   }
 }

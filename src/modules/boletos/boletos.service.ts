@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Boleto } from './entities/boleto.entity';
-import { LoggingService } from '../logging/logging.service';
+import { LoggingService } from '../../logging/logging.service';
 import { UsersService } from '../users/users.service';
 import { v4 as uuidv4 } from 'uuid';
 

@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { LoggingService } from '../logging/logging.service';
+import { LoggingService } from '../../logging/logging.service';
 import { EscaneoQR } from './entities/escaneo-qr.entity';
 import * as QRCode from 'qrcode';
 

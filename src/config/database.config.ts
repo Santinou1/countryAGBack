@@ -1,7 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { User } from '../users/entities/user.entity';
-import { Boleto } from '../boletos/entities/boleto.entity';
-import { EscaneoQR } from '../qr/entities/escaneo-qr.entity';
+import { User } from '../modules/users/entities/user.entity';
+import { Boleto } from '../modules/boletos/entities/boleto.entity';
+import { EscaneoQR } from '../modules/qr/entities/escaneo-qr.entity';
 import { config } from 'dotenv';
 
 // Cargar las variables de entorno
