@@ -23,14 +23,14 @@ export class UsersService implements OnModuleInit {
     const defaultUsers = [
       {
         email: 'admin@admin.com',
-        contraseña: '123456',
+        contraseña: '123456san',
         nombre: 'Admin',
         apellido: 'Sistema',
         rol: UserRole.ADMIN
       },
       {
         email: 'user@user.com',
-        contraseña: '123456',
+        contraseña: '123456san',
         nombre: 'Usuario',
         apellido: 'Sistema',
         rol: UserRole.USUARIO

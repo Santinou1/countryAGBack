@@ -81,4 +81,14 @@ export class BoletosService {
 
         return boleto;
     }
+
+    async getAllBoletos(): Promise<Boleto[]> {
+        this.logger.log('Obteniendo todos los boletos con información de usuarios', 'BoletosService');
+        return this.boletosRepository.find({
+            relations: ['usuario'],
+            order: {
+                id: 'DESC' // Ordenar por ID, más recientes primero (asumiendo que IDs más altos son más recientes)
+            }
+        });
+    }
 } 
