@@ -1,6 +1,12 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
+export enum EstadoBoleto {
+    PENDIENTE = 'pendiente',
+    APROBADO = 'aprobado',
+    RECHAZADO = 'rechazado'
+}
+
 @Entity('boletos')
 export class Boleto {
     @PrimaryGeneratedColumn({ name: 'id' })
@@ -14,6 +20,14 @@ export class Boleto {
 
     @Column({ name: 'lote' })
     lote: string;
+
+    @Column({
+        name: 'estado',
+        type: 'enum',
+        enum: EstadoBoleto,
+        default: EstadoBoleto.PENDIENTE
+    })
+    estado: EstadoBoleto;
 
     @Column({ name: 'ida', default: false })
     ida: boolean;

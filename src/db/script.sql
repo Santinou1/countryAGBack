@@ -20,6 +20,7 @@ CREATE TABLE boletos (
     idUsers INT NOT NULL,
     codigo_boleto VARCHAR(100) NOT NULL,
     lote VARCHAR(100) NOT NULL,
+    estado ENUM('pendiente', 'aprobado', 'rechazado') NOT NULL DEFAULT 'pendiente',
     ida BOOLEAN DEFAULT FALSE,
     vuelta BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (idUsers) REFERENCES personas(id) ON DELETE CASCADE

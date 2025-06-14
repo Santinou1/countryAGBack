@@ -1,10 +1,11 @@
 import { Controller, Post, Get, Param, Body, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { BoletosService } from './boletos.service';
-import { Boleto } from './entities/boleto.entity';
+import { Boleto, EstadoBoleto } from './entities/boleto.entity';
 import { CreateBoletoDto } from './dto/create-boleto.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('boletos')
+@UseGuards(JwtAuthGuard)
 export class BoletosController {
     constructor(private readonly boletosService: BoletosService) {}
 
@@ -37,6 +38,31 @@ export class BoletosController {
         @Param('boletoId', ParseIntPipe) boletoId: number
     ): Promise<Boleto> {
         return this.boletosService.marcarVuelta(userId, boletoId);
+    }
+
+    @Post(':boletoId/estado/:userId')
+    async actualizarEstadoBoleto(
+        @Param('userId', ParseIntPipe) userId: number,
+        @Param('boletoId', ParseIntPipe) boletoId: number,
+        @Body('estado') estado: EstadoBoleto
+    ): Promise<Boleto> {
+        return this.boletosService.actualizarEstadoBoleto(userId, boletoId, estado);
+    }
+
+    @Post(':boletoId/aprobar/:userId')
+    async aprobarBoleto(
+        @Param('userId', ParseIntPipe) userId: number,
+        @Param('boletoId', ParseIntPipe) boletoId: number
+    ): Promise<Boleto> {
+        return this.boletosService.aprobarBoleto(userId, boletoId);
+    }
+
+    @Post(':boletoId/rechazar/:userId')
+    async rechazarBoleto(
+        @Param('userId', ParseIntPipe) userId: number,
+        @Param('boletoId', ParseIntPipe) boletoId: number
+    ): Promise<Boleto> {
+        return this.boletosService.rechazarBoleto(userId, boletoId);
     }
 
     @Get()

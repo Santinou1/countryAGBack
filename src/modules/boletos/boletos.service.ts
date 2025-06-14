@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Boleto } from './entities/boleto.entity';
+import { Boleto, EstadoBoleto } from './entities/boleto.entity';
 import { LoggingService } from '../../logging/logging.service';
 import { UsersService } from '../users/users.service';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,7 +23,8 @@ export class BoletosService {
         const nuevoBoleto = this.boletosRepository.create({
             idUsers: userId,
             lote: lote,
-            codigoBoleto: uuidv4(), // Genera un código único para el boleto
+            codigoBoleto: uuidv4(),
+            estado: EstadoBoleto.PENDIENTE,
             ida: false,
             vuelta: false
         });
@@ -90,5 +91,21 @@ export class BoletosService {
                 id: 'DESC' // Ordenar por ID, más recientes primero (asumiendo que IDs más altos son más recientes)
             }
         });
+    }
+
+    async actualizarEstadoBoleto(userId: number, boletoId: number, nuevoEstado: EstadoBoleto): Promise<Boleto> {
+        const boleto = await this.verificarPropietarioBoleto(userId, boletoId);
+        
+        boleto.estado = nuevoEstado;
+        this.logger.log(`Actualizando estado del boleto ${boletoId} a ${nuevoEstado} para usuario ${userId}`, 'BoletosService');
+        return this.boletosRepository.save(boleto);
+    }
+
+    async aprobarBoleto(userId: number, boletoId: number): Promise<Boleto> {
+        return this.actualizarEstadoBoleto(userId, boletoId, EstadoBoleto.APROBADO);
+    }
+
+    async rechazarBoleto(userId: number, boletoId: number): Promise<Boleto> {
+        return this.actualizarEstadoBoleto(userId, boletoId, EstadoBoleto.RECHAZADO);
     }
 } 
