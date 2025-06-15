@@ -70,4 +70,33 @@ export class BoletosController {
     async getAllBoletos(): Promise<Boleto[]> {
         return this.boletosService.getAllBoletos();
     }
+
+    @Post('consumir-ida/:codigo')
+    async consumirIdaPorCodigo(
+        @Param('codigo') codigo: string
+    ): Promise<Boleto> {
+        return this.boletosService.consumirIdaPorCodigo(codigo);
+    }
+
+    @Post('consumir-vuelta/:codigo')
+    async consumirVueltaPorCodigo(
+        @Param('codigo') codigo: string
+    ): Promise<Boleto> {
+        return this.boletosService.consumirVueltaPorCodigo(codigo);
+    }
+
+    @Get('pendientes')
+    async getBoletosPendientes(): Promise<Boleto[]> {
+        return this.boletosService.getBoletosPendientes();
+    }
+
+    @Get('confirmados')
+    async getBoletosConfirmados(): Promise<Boleto[]> {
+        return this.boletosService.getBoletosConfirmados();
+    }
+
+    @Get('consumidos')
+    async getBoletosConsumidos(): Promise<Boleto[]> {
+        return this.boletosService.getBoletosConsumidos();
+    }
 } 

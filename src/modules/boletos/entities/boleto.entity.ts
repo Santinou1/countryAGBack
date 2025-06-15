@@ -15,6 +15,20 @@ export class Boleto {
     @Column({ name: 'idUsers' })
     idUsers: number;
 
+    @Column({ 
+        name: 'codigo_ida',
+        length: 4,
+        nullable: true
+    })
+    codigoIda: string;
+
+    @Column({ 
+        name: 'codigo_vuelta',
+        length: 4,
+        nullable: true
+    })
+    codigoVuelta: string;
+
     @Column({ name: 'codigo_boleto' })
     codigoBoleto: string;
 

@@ -14,11 +14,20 @@ export class QrController {
         @Param('boletoId') boletoId: string,
         @Param('userId') userId: string
     ) {
-        return this.qrService.generateQR({
+        const response = await this.qrService.generateQR({
             type: 'ida',
             boletoId: parseInt(boletoId),
             userId: parseInt(userId)
         });
+
+        return {
+            qrCode: response.qrCode,
+            codigo: response.codigo,
+            codigoIda: response.codigoIda,
+            codigoVuelta: response.codigoVuelta,
+            base64: response.base64,
+            type: 'ida'
+        };
     }
 
     @Post('generar/vuelta/:boletoId/:userId')
@@ -26,11 +35,20 @@ export class QrController {
         @Param('boletoId') boletoId: string,
         @Param('userId') userId: string
     ) {
-        return this.qrService.generateQR({
+        const response = await this.qrService.generateQR({
             type: 'vuelta',
             boletoId: parseInt(boletoId),
             userId: parseInt(userId)
         });
+
+        return {
+            qrCode: response.qrCode,
+            codigo: response.codigo,
+            codigoIda: response.codigoIda,
+            codigoVuelta: response.codigoVuelta,
+            base64: response.base64,
+            type: 'vuelta'
+        };
     }
 
     @Post('escanear/:adminId')

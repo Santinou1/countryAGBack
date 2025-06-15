@@ -1,15 +1,25 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LoggingService } from '../../logging/logging.service';
 import { EscaneoQR } from './entities/escaneo-qr.entity';
 import * as QRCode from 'qrcode';
+import { BoletosService } from '../boletos/boletos.service';
 
 interface QRData {
     type: 'ida' | 'vuelta';
     boletoId: number;
     userId: number;
     timestamp?: string;
+    codigo?: string;
+}
+
+interface QRResponse {
+    qrCode: string;
+    codigo: string;
+    codigoIda: string | null;
+    codigoVuelta: string | null;
+    base64: string;
 }
 
 @Injectable()
@@ -17,14 +27,28 @@ export class QrService {
     constructor(
         @InjectRepository(EscaneoQR)
         private escaneoRepository: Repository<EscaneoQR>,
-        private readonly logger: LoggingService
+        private readonly logger: LoggingService,
+        private readonly boletosService: BoletosService
     ) {}
 
-    async generateQR(data: QRData): Promise<string> {
+    async generateQR(data: QRData): Promise<QRResponse> {
         try {
+            // Obtener el boleto
+            const boleto = await this.boletosService.getBoletoById(data.boletoId);
+            if (!boleto) {
+                throw new NotFoundException('Boleto no encontrado');
+            }
+
+            // Obtener el código según el tipo
+            const codigo = data.type === 'ida' ? boleto.codigoIda : boleto.codigoVuelta;
+            if (!codigo) {
+                throw new BadRequestException(`No hay código de ${data.type} disponible para este boleto`);
+            }
+
             // Creamos un objeto con la información necesaria
             const qrData = {
                 ...data,
+                codigo,
                 timestamp: new Date().toISOString(), // Agregamos timestamp para seguridad
             };
 
@@ -34,8 +58,21 @@ export class QrService {
             // Generamos el QR como una URL de datos (base64)
             const qrCode = await QRCode.toDataURL(stringData);
             
-            this.logger.log(`QR generado para boleto ${data.boletoId} - ${data.type}`, 'QrService');
-            return qrCode;
+            // Extraemos el base64 puro (sin el prefijo data:image/png;base64,)
+            const base64 = qrCode.split(',')[1];
+            
+            this.logger.log(
+                `QR generado para boleto ${data.boletoId} - ${data.type} con código ${codigo}`,
+                'QrService'
+            );
+
+            return {
+                qrCode,
+                codigo,
+                codigoIda: boleto.codigoIda,
+                codigoVuelta: boleto.codigoVuelta,
+                base64
+            };
         } catch (error) {
             this.logger.error(`Error generando QR: ${error.message}`, error.stack, 'QrService');
             throw error;
@@ -59,7 +96,7 @@ export class QrService {
             }
             
             // Verificamos que tenga la estructura correcta
-            if (!decodedData.type || !decodedData.boletoId || !decodedData.userId) {
+            if (!decodedData.type || !decodedData.boletoId || !decodedData.userId || !decodedData.codigo) {
                 throw new BadRequestException('QR inválido: datos incompletos');
             }
 
@@ -68,11 +105,12 @@ export class QrService {
                 throw new BadRequestException('QR inválido: tipo no válido');
             }
 
-            this.logger.log(`QR decodificado para boleto ${decodedData.boletoId}`, 'QrService');
+            this.logger.log(`QR decodificado para boleto ${decodedData.boletoId} con código ${decodedData.codigo}`, 'QrService');
             return {
                 type: decodedData.type,
                 boletoId: decodedData.boletoId,
-                userId: decodedData.userId
+                userId: decodedData.userId,
+                codigo: decodedData.codigo
             };
         } catch (error) {
             this.logger.error(`Error decodificando QR: ${error.message}`, error.stack, 'QrService');
