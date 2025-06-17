@@ -15,6 +15,6 @@ export const databaseConfig: TypeOrmModuleOptions = {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     entities: [User, Boleto, EscaneoQR],
-    synchronize: false, // Lo dejamos en false para no alterar la estructura de la base de datos existente
+    synchronize: true, // Lo dejamos en false para no alterar la estructura de la base de datos existente
     logging: false, // Desactivamos el logging de queries
 }; 
