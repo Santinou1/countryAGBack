@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { DateUtils } from 'src/date-utils';
 
@@ -47,6 +47,9 @@ export class Boleto {
 
   @Column({ name: 'qr_valido_hasta', type: 'timestamp', nullable: true })
   qrValidoHasta: Date | null;
+
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+  createdAt: Date;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'idUsers' })

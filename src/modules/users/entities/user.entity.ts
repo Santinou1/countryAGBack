@@ -25,4 +25,7 @@ export class User {
         default: UserRole.USUARIO
     })
     rol: UserRole;
+
+    @Column({ name: 'DNI', unique: true, nullable: true })
+    dni: string;
 }

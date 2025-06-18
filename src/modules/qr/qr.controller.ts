@@ -57,7 +57,7 @@ export class QrController {
       // Consumir el boleto usando el código
       await this.boletosService.consumirBoletoPorCodigo(decodedData.codigo);
 
-      // Registrar el escaneo
+      // Registrar el escaneo y devolver info del propietario
       return this.qrService.registrarEscaneo(decodedData.boletoId, parseInt(adminId));
     } catch (error) {
       if (error instanceof BadRequestException) {

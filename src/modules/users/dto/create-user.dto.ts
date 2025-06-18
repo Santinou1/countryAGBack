@@ -21,4 +21,8 @@ export class CreateUserDto {
 
     @IsEnum(UserRole, { message: 'El rol debe ser usuario o admin' })
     rol?: UserRole = UserRole.USUARIO;
+
+    @IsString()
+    @IsNotEmpty({ message: 'El DNI es requerido' })
+    dni: string;
 } 

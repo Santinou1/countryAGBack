@@ -12,6 +12,7 @@ CREATE TABLE personas (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
+    dni VARCHAR(20) UNIQUE,
     email VARCHAR(150) NOT NULL UNIQUE,
     contraseña VARCHAR(255) NOT NULL,
     rol ENUM('usuario', 'admin') NOT NULL DEFAULT 'usuario'
@@ -30,6 +31,7 @@ CREATE TABLE boletos (
     contador INT DEFAULT 0,
     qr_activo BOOLEAN DEFAULT FALSE,
     qr_valido_hasta TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (idUsers) REFERENCES personas(id) ON DELETE CASCADE
 );
 

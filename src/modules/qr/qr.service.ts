@@ -127,14 +127,39 @@ export class QrService {
     }
   }
 
-  async registrarEscaneo(boletoId: number, adminId: number): Promise<EscaneoQR> {
+  async registrarEscaneo(boletoId: number, adminId: number): Promise<any> {
     const escaneo = this.escaneoRepository.create({
       boletoId,
       escaneadoPor: adminId,
     });
 
     this.logger.log(`Registrando escaneo de boleto ${boletoId} por admin ${adminId}`, 'QrService');
-    return this.escaneoRepository.save(escaneo);
+    const savedEscaneo = await this.escaneoRepository.save(escaneo);
+
+    // Obtener el boleto con la relación usuario
+    const boleto = await this.boletosService.getBoletoById(boletoId);
+    console.log('Usuario propietario del boleto:', boleto?.usuario);
+    let nombre = '';
+    let apellido = '';
+    let codigo = '';
+    let dni = '';
+    if (boleto && boleto.usuario) {
+      nombre = boleto.usuario.nombre;
+      apellido = boleto.usuario.apellido;
+      codigo = boleto.codigoBoleto;
+      dni = boleto.usuario.dni;
+    }
+
+    return {
+      escaneo: savedEscaneo,
+      propietario: {
+        nombre,
+        apellido,
+        dni,
+      },
+      codigo,
+      boletoId,
+    };
   }
 
   async getEscaneosPorBoleto(boletoId: number): Promise<EscaneoQR[]> {

@@ -26,14 +26,16 @@ export class UsersService implements OnModuleInit {
         contraseña: '123456san',
         nombre: 'Admin',
         apellido: 'Sistema',
-        rol: UserRole.ADMIN
+        rol: UserRole.ADMIN,
+        dni: '11111111'
       },
       {
         email: 'user@user.com',
         contraseña: '123456san',
         nombre: 'Usuario',
         apellido: 'Sistema',
-        rol: UserRole.USUARIO
+        rol: UserRole.USUARIO,
+        dni: '22222222'
       }
     ];
 

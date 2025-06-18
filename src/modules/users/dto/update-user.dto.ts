@@ -22,4 +22,8 @@ export class UpdateUserDto {
     @IsOptional()
     @IsEnum(UserRole, { message: 'El rol debe ser usuario o admin' })
     rol?: UserRole;
+
+    @IsOptional()
+    @IsString()
+    dni?: string;
 } 
