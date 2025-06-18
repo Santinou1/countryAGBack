@@ -26,4 +26,26 @@ export class UpdateUserDto {
     @IsOptional()
     @IsString()
     dni?: string;
+
+    @IsOptional()
+    @IsString()
+    celular?: string;
+
+    @IsOptional()
+    @IsString()
+    area?: string;
+
+    @IsOptional()
+    @IsString()
+    lote?: string;
+
+    @IsOptional()
+    @IsString()
+    ocupacion?: string;
+
+    @IsOptional()
+    esPropietario?: boolean;
+
+    @IsOptional()
+    esProveedor?: boolean;
 } 

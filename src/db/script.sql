@@ -15,7 +15,13 @@ CREATE TABLE personas (
     dni VARCHAR(20) UNIQUE,
     email VARCHAR(150) NOT NULL UNIQUE,
     contraseña VARCHAR(255) NOT NULL,
-    rol ENUM('usuario', 'admin') NOT NULL DEFAULT 'usuario'
+    rol ENUM('usuario', 'admin', 'propietario', 'proveedor') NOT NULL DEFAULT 'usuario',
+    celular VARCHAR(30),
+    area VARCHAR(100),
+    lote VARCHAR(100),
+    ocupacion VARCHAR(100),
+    esPropietario BOOLEAN DEFAULT FALSE,
+    esProveedor BOOLEAN DEFAULT FALSE
 );
 
 -- Tabla de boletos (nueva lógica: uso ilimitado por 24 horas)

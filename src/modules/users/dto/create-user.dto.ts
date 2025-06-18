@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsEnum, IsNotEmpty, MinLength } from 'class-validator';
+import { IsString, IsEmail, IsEnum, IsNotEmpty, MinLength, IsBoolean, IsOptional, ValidateIf, IsNumberString } from 'class-validator';
 import { UserRole } from '../entities/user-role.enum';
 
 export class CreateUserDto {
@@ -19,10 +19,37 @@ export class CreateUserDto {
     @IsNotEmpty({ message: 'La contraseña es requerida' })
     contraseña: string;
 
-    @IsEnum(UserRole, { message: 'El rol debe ser usuario o admin' })
+    @IsEnum(UserRole, { message: 'El rol debe ser usuario, admin, propietario o proveedor' })
     rol?: UserRole = UserRole.USUARIO;
 
-    @IsString()
+    @IsNumberString({}, { message: 'El DNI debe ser un número' })
     @IsNotEmpty({ message: 'El DNI es requerido' })
     dni: string;
+
+    @IsNumberString({}, { message: 'El celular debe ser un número' })
+    @IsNotEmpty({ message: 'El celular es requerido' })
+    celular: string;
+
+    @ValidateIf(o => o.esPropietario === true)
+    @IsString({ message: 'El área debe ser un texto' })
+    @IsNotEmpty({ message: 'El área es requerida para propietarios' })
+    area?: string;
+
+    @ValidateIf(o => o.esPropietario === true)
+    @IsString({ message: 'El lote debe ser un texto' })
+    @IsNotEmpty({ message: 'El lote es requerido para propietarios' })
+    lote?: string;
+
+    @ValidateIf(o => o.esProveedor === true)
+    @IsString({ message: 'La ocupación debe ser un texto' })
+    @IsNotEmpty({ message: 'La ocupación es requerida para proveedores' })
+    ocupacion?: string;
+
+    @IsOptional()
+    @IsBoolean({ message: 'esPropietario debe ser booleano' })
+    esPropietario?: boolean;
+
+    @IsOptional()
+    @IsBoolean({ message: 'esProveedor debe ser booleano' })
+    esProveedor?: boolean;
 } 

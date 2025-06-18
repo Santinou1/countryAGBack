@@ -28,4 +28,22 @@ export class User {
 
     @Column({ name: 'DNI', unique: true, nullable: true })
     dni: string;
+
+    @Column({ name: 'Celular', nullable: true })
+    celular: string;
+
+    @Column({ name: 'Area', nullable: true })
+    area: string;
+
+    @Column({ name: 'Lote', nullable: true })
+    lote: string;
+
+    @Column({ name: 'Ocupacion', nullable: true })
+    ocupacion: string;
+
+    @Column({ name: 'EsPropietario', type: 'boolean', default: false })
+    esPropietario: boolean;
+
+    @Column({ name: 'EsProveedor', type: 'boolean', default: false })
+    esProveedor: boolean;
 }

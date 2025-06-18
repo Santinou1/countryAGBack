@@ -27,7 +27,8 @@ export class UsersService implements OnModuleInit {
         nombre: 'Admin',
         apellido: 'Sistema',
         rol: UserRole.ADMIN,
-        dni: '11111111'
+        dni: '11111111',
+        celular: '1111111111'
       },
       {
         email: 'user@user.com',
@@ -35,7 +36,8 @@ export class UsersService implements OnModuleInit {
         nombre: 'Usuario',
         apellido: 'Sistema',
         rol: UserRole.USUARIO,
-        dni: '22222222'
+        dni: '22222222',
+        celular: '2222222222'
       }
     ];
 
