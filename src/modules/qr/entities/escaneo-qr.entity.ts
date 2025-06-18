@@ -20,7 +20,7 @@ export class EscaneoQR {
   @CreateDateColumn({
     name: 'fecha_escaneo',
     type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
+    nullable: false,
   })
   fechaEscaneo: Date;
 
