@@ -14,9 +14,13 @@ export class MercadoPagoService {
     private boletosService: BoletosService,
     private usersService: UsersService,
   ) {
-    const accessToken = this.configService.get<string>(
-      'MERCADOPAGO_ACCESS_TOKEN',
-    );
+    // Temporalmente, usamos el token directamente en el código para depurar.
+    // Se ha comentado la lectura desde las variables de entorno.
+    const accessToken = 'APP_USR-1409345633316523-062009-c38309734525c1183fdc0d3612bac582-25088658';
+    
+    // const accessToken = this.configService.get<string>(
+    //   'MERCADOPAGO_ACCESS_TOKEN',
+    // );
     if (!accessToken) {
       throw new Error('MERCADOPAGO_ACCESS_TOKEN is not defined');
     }
