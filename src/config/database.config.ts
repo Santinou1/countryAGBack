@@ -18,7 +18,7 @@ export const databaseConfig: TypeOrmModuleOptions = {
   synchronize: false, // Lo dejamos en false para no alterar la estructura de la base de datos existente
   logging: false, // Desactivamos el logging de queries
   extra: {
-    timezone: 'America/Argentina/Buenos_Aires',
+    timezone: '-03:00',
     charset: 'utf8mb4_unicode_ci',
   },
 };
