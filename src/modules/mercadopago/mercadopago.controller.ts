@@ -1,5 +1,4 @@
-import { Controller, Post, Req, Res, HttpCode, Body } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Post, HttpCode, Body } from '@nestjs/common';
 import { MercadoPagoService } from './mercadopago.service';
 
 @Controller('mercadopago')
@@ -8,12 +7,10 @@ export class MercadoPagoController {
 
   @Post('webhook')
   @HttpCode(200)
-  handleWebhook(@Body() body: { type: string; data: { id: string } }) {
-    if (body.type === 'payment') {
+  handleWebhook(@Body() body: any) {
+    if (body.type === 'payment' && body.data?.id) {
       this.mercadoPagoService.handlePaymentNotification(body.data.id);
     }
-    // Respondemos inmediatamente a Mercado Pago para evitar reintentos.
-    // El procesamiento real se hace de forma asíncrona.
   }
 
   @Post('create-preference')
