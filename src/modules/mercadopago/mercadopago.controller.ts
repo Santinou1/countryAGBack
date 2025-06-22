@@ -1,4 +1,5 @@
-import { Controller, Post, HttpCode, Body } from '@nestjs/common';
+import { Controller, Post, Req, HttpCode, Body } from '@nestjs/common';
+import { Request } from 'express';
 import { MercadoPagoService } from './mercadopago.service';
 
 @Controller('mercadopago')
@@ -7,7 +8,9 @@ export class MercadoPagoController {
 
   @Post('webhook')
   @HttpCode(200)
-  handleWebhook(@Body() body: any) {
+  handleWebhook(@Req() req: Request & { rawBody: Buffer }) {
+    const body = JSON.parse(req.rawBody.toString());
+    
     if (body.type === 'payment' && body.data?.id) {
       this.mercadoPagoService.handlePaymentNotification(body.data.id);
     }
