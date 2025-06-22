@@ -296,4 +296,35 @@ export class BoletosService {
       esValido: boleto.isQRValido(),
     };
   }
+
+  async consumoManualAdmin(boletoId: number): Promise<Boleto> {
+    const boleto = await this.boletosRepository.findOne({
+      where: { id: boletoId },
+    });
+
+    if (!boleto) {
+      throw new NotFoundException('Boleto no encontrado');
+    }
+
+    if (boleto.estado !== EstadoBoleto.APROBADO) {
+      throw new BadRequestException('El boleto no está aprobado y no puede ser consumido.');
+    }
+
+    // Comprobar si el boleto es válido (no ha expirado)
+    if (boleto.primerUso && !boleto.isValido()) {
+      throw new BadRequestException('El boleto está expirado y no puede ser consumido.');
+    }
+    
+    // Si es el primer uso, se registra para iniciar la validez
+    if (!boleto.primerUso) {
+      boleto.registrarPrimerUso();
+    }
+
+    boleto.incrementarContador();
+    this.logger.log(
+      `Consumo manual por admin para boleto ${boletoId}. Nuevo contador: ${boleto.contador}`,
+      'BoletosService',
+    );
+    return this.boletosRepository.save(boleto);
+  }
 }

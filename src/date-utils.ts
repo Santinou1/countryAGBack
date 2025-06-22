@@ -39,6 +39,13 @@ export class DateUtils {
   }
 
   /**
+   * Obtiene el final del día de una fecha dada en timezone de Argentina
+   */
+  static endOfDay(date: Date): Date {
+    return moment(date).tz(this.TIMEZONE).endOf('day').toDate();
+  }
+
+  /**
    * Verifica si una fecha ha expirado (es anterior a la fecha actual en Argentina)
    */
   static isExpired(date: Date): boolean {

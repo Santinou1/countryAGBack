@@ -7,6 +7,8 @@ import {
   ParseIntPipe,
   UseGuards,
   NotFoundException,
+  Req,
+  ForbiddenException
 } from '@nestjs/common';
 import { BoletosService } from './boletos.service';
 import { Boleto, EstadoBoleto } from './entities/boleto.entity';
@@ -87,8 +89,21 @@ export class BoletosController {
   }
 
   @Get('consumidos')
-  async getBoletosConsumidos(): Promise<Boleto[]> {
+  @UseGuards(JwtAuthGuard)
+  getBoletosConsumidos() {
     return this.boletosService.getBoletosConsumidos();
+  }
+
+  @Post('consumo-manual/:id')
+  @UseGuards(JwtAuthGuard)
+  async consumoManualAdmin(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req,
+  ): Promise<Boleto> {
+    if (req.user.rol !== 'admin') {
+      throw new ForbiddenException('No tienes permisos para realizar esta acción.');
+    }
+    return this.boletosService.consumoManualAdmin(id);
   }
 
   // Nuevos endpoints para el sistema anti-fraude de QR

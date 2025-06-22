@@ -103,7 +103,7 @@ export class Boleto {
   registrarPrimerUso(): void {
     if (!this.primerUso) {
       this.primerUso = DateUtils.now();
-      this.validoHasta = DateUtils.addHours(this.primerUso, 24); // 24 horas
+      this.validoHasta = DateUtils.endOfDay(this.primerUso); // Válido hasta el final del día del primer uso
     }
   }
 
