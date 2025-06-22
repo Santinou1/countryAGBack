@@ -57,7 +57,7 @@ export class MercadoPagoService {
           failure: `https://transporteenpunto.com.ar/home?payment_status=failure`,
           pending: `https://transporteenpunto.com.ar/home?payment_status=pending`,
         },
-        notification_url: `https://f897-196-32-89-39.ngrok-free.app/api/mercadopago/webhook`,
+        notification_url: `https://transporteenpunto.com.ar/api/mercadopago/webhook`,
         external_reference: nuevoBoleto.id.toString(), // 3. Enviar ID del boleto como referencia
       },
     });
