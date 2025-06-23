@@ -27,7 +27,7 @@ export class MercadoPagoService {
 
   async createPaymentPreference(payer: { email: string }) {
     // Log de todas las variables de entorno para depuración
-    this.logger.log('Variables de entorno actuales:', process.env);
+    //this.logger.log('Variables de entorno actuales:', process.env);
 
     const preference = new Preference(this.client);
 
