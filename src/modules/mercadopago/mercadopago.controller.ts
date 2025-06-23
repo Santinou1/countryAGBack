@@ -8,11 +8,21 @@ export class MercadoPagoController {
 
   @Post('webhook')
   @HttpCode(200)
-  handleWebhook(@Req() req: Request & { rawBody: Buffer }) {
-    const body = JSON.parse(req.rawBody.toString());
-    
-    if (body.type === 'payment' && body.data?.id) {
-      this.mercadoPagoService.handlePaymentNotification(body.data.id);
+  handleWebhook(@Req() req: Request & { rawBody?: Buffer }, @Body() body: any) {
+    let data: any;
+
+    if (req.rawBody) {
+      try {
+        data = JSON.parse(req.rawBody.toString());
+      } catch (e) {
+        data = body; // fallback
+      }
+    } else {
+      data = body;
+    }
+
+    if (data.type === 'payment' && data.data?.id) {
+      this.mercadoPagoService.handlePaymentNotification(data.data.id);
     }
   }
 
