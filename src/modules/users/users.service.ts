@@ -27,8 +27,12 @@ export class UsersService implements OnModuleInit {
         nombre: 'Admin',
         apellido: 'Sistema',
         rol: UserRole.ADMIN,
-        dni: '11111111',
-        celular: '1111111111'
+        dni: '21848036',
+        celular: '2226502472',
+        area: 'Nuestra Señora del Pilar',
+        lote: '16',
+        esPropietario: true,
+        esProveedor: false
       },
       {
         email: 'user@user.com',
@@ -36,8 +40,11 @@ export class UsersService implements OnModuleInit {
         nombre: 'Usuario',
         apellido: 'Sistema',
         rol: UserRole.USUARIO,
-        dni: '22222222',
-        celular: '2222222222'
+        dni: '44264552',
+        celular: '2226502471',
+        ocupacion: 'Servicios Domesticos',
+        esPropietario: false,
+        esProveedor: true
       }
     ];
 
