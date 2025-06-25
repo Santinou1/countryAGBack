@@ -8,12 +8,15 @@ import {
   UseGuards,
   NotFoundException,
   Req,
-  ForbiddenException
+  ForbiddenException,
 } from '@nestjs/common';
 import { BoletosService } from './boletos.service';
 import { Boleto, EstadoBoleto } from './entities/boleto.entity';
 import { CreateBoletoDto } from './dto/create-boleto.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../users/entities/user-role.enum';
 import { DateUtils } from 'src/date-utils';
 
 @Controller('boletos')
@@ -52,6 +55,8 @@ export class BoletosController {
   }
 
   @Post(':boletoId/aprobar/:userId')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.CHOFER)
   async aprobarBoleto(
     @Param('userId', ParseIntPipe) userId: number,
     @Param('boletoId', ParseIntPipe) boletoId: number,
@@ -60,6 +65,8 @@ export class BoletosController {
   }
 
   @Post(':boletoId/rechazar/:userId')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.CHOFER)
   async rechazarBoleto(
     @Param('userId', ParseIntPipe) userId: number,
     @Param('boletoId', ParseIntPipe) boletoId: number,
@@ -95,12 +102,10 @@ export class BoletosController {
   }
 
   @Post('consumo-manual/:id')
-  @UseGuards(JwtAuthGuard)
-  async consumoManualAdmin(
-    @Param('id', ParseIntPipe) id: number,
-    @Req() req,
-  ): Promise<Boleto> {
-    if (req.user.rol !== 'admin') {
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.CHOFER)
+  async consumoManualAdmin(@Param('id', ParseIntPipe) id: number, @Req() req): Promise<Boleto> {
+    if (req.user.rol !== 'chofer') {
       throw new ForbiddenException('No tienes permisos para realizar esta acción.');
     }
     return this.boletosService.consumoManualAdmin(id);

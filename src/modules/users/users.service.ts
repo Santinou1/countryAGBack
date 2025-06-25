@@ -12,7 +12,7 @@ export class UsersService implements OnModuleInit {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private readonly logger: LoggingService
+    private readonly logger: LoggingService,
   ) {}
 
   async onModuleInit() {
@@ -32,7 +32,7 @@ export class UsersService implements OnModuleInit {
         area: 'Nuestra Señora del Pilar',
         lote: '16',
         esPropietario: true,
-        esProveedor: false
+        esProveedor: false,
       },
       {
         email: 'user@user.com',
@@ -44,14 +44,25 @@ export class UsersService implements OnModuleInit {
         celular: '2226502471',
         ocupacion: 'Servicios Domesticos',
         esPropietario: false,
-        esProveedor: true
-      }
+        esProveedor: true,
+      },
+      {
+        email: 'chofer@chofer.com',
+        contraseña: '123456san',
+        nombre: 'Chofer',
+        apellido: 'Sistema',
+        rol: UserRole.CHOFER,
+        dni: '12345678',
+        celular: '2226502473',
+        esPropietario: false,
+        esProveedor: false,
+      },
     ];
 
     for (const userData of defaultUsers) {
       try {
         const existingUser = await this.usersRepository.findOne({
-          where: { email: userData.email }
+          where: { email: userData.email },
         });
 
         if (!existingUser) {
@@ -61,7 +72,11 @@ export class UsersService implements OnModuleInit {
           this.logger.log(`Usuario por defecto ya existe: ${userData.email}`, 'UsersService');
         }
       } catch (error) {
-        this.logger.error(`Error al crear usuario por defecto ${userData.email}: ${error.message}`, error.stack, 'UsersService');
+        this.logger.error(
+          `Error al crear usuario por defecto ${userData.email}: ${error.message}`,
+          error.stack,
+          'UsersService',
+        );
       }
     }
   }
@@ -83,10 +98,10 @@ export class UsersService implements OnModuleInit {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     this.logger.log(`Creando nuevo usuario con email: ${createUserDto.email}`, 'UsersService');
-    
+
     // Verificar si el email ya existe
     const existingUser = await this.usersRepository.findOne({
-      where: { email: createUserDto.email }
+      where: { email: createUserDto.email },
     });
 
     if (existingUser) {
@@ -97,7 +112,7 @@ export class UsersService implements OnModuleInit {
 
     const newUser = this.usersRepository.create({
       ...createUserDto,
-      rol: createUserDto.rol || UserRole.USUARIO
+      rol: createUserDto.rol || UserRole.USUARIO,
     });
 
     const savedUser = await this.usersRepository.save(newUser);
@@ -107,14 +122,14 @@ export class UsersService implements OnModuleInit {
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     this.logger.log(`Actualizando usuario con ID: ${id}`, 'UsersService');
-    
+
     // Verificar que el usuario existe
     await this.findOne(id);
 
     // Si se está actualizando el email, verificar que no exista
     if (updateUserDto.email) {
       const existingUser = await this.usersRepository.findOne({
-        where: { email: updateUserDto.email }
+        where: { email: updateUserDto.email },
       });
 
       if (existingUser && existingUser.id !== id) {
@@ -154,7 +169,7 @@ export class UsersService implements OnModuleInit {
   async getMe(userId: number): Promise<User> {
     this.logger.log(`Obteniendo información del usuario: ${userId}`, 'UsersService');
     const user = await this.usersRepository.findOne({ where: { id: userId } });
-    
+
     if (!user) {
       this.logger.error(`Usuario no encontrado: ${userId}`, undefined, 'UsersService');
       throw new NotFoundException(`Usuario no encontrado`);
@@ -162,13 +177,20 @@ export class UsersService implements OnModuleInit {
 
     // Loguear la información completa del usuario
     this.logger.log('Información del usuario:', 'UsersService');
-    this.logger.log(JSON.stringify({
-      id: user.id,
-      email: user.email,
-      nombre: user.nombre,
-      apellido: user.apellido,
-      rol: user.rol
-    }, null, 2), 'UsersService');
+    this.logger.log(
+      JSON.stringify(
+        {
+          id: user.id,
+          email: user.email,
+          nombre: user.nombre,
+          apellido: user.apellido,
+          rol: user.rol,
+        },
+        null,
+        2,
+      ),
+      'UsersService',
+    );
 
     return user;
   }

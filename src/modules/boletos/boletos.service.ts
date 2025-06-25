@@ -109,10 +109,10 @@ export class BoletosService {
       'BoletosService',
     );
 
-    // Verificar si el usuario es admin
+    // Verificar si el usuario es admin o chofer
     const usuario = await this.usersService.findOne(userId);
-    if (usuario && usuario.rol === 'admin') {
-      this.logger.log(`Usuario ${userId} es admin, permitiendo operación`, 'BoletosService');
+    if (usuario && (usuario.rol === 'admin' || usuario.rol === 'chofer')) {
+      this.logger.log(`Usuario ${userId} es ${usuario.rol}, permitiendo operación`, 'BoletosService');
       return boleto;
     }
 

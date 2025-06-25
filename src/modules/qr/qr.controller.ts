@@ -1,6 +1,10 @@
-import { Controller, Post, Body, Param, Get, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get, BadRequestException, UseGuards } from '@nestjs/common';
 import { QrService } from './qr.service';
 import { BoletosService } from '../boletos/boletos.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../users/entities/user-role.enum';
 
 @Controller('qr')
 export class QrController {
@@ -24,6 +28,8 @@ export class QrController {
   }
 
   @Post('escanear/:adminId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.CHOFER)
   async escanearQR(@Param('adminId') adminId: string, @Body() body: { qrData: any }) {
     try {
       if (!body.qrData) {
