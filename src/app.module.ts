@@ -7,6 +7,7 @@ import { LoggingModule } from './logging/logging.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { QrModule } from './modules/qr/qr.module';
 import { MercadoPagoModule } from './modules/mercadopago/mercadopago.module';
+import { MetricasModule } from './modules/metricas/metricas.module';
 import { databaseConfig } from './config/database.config';
 
 @Module({
@@ -21,7 +22,8 @@ import { databaseConfig } from './config/database.config';
     BoletosModule,
     AuthModule,
     QrModule,
-    MercadoPagoModule
+    MercadoPagoModule,
+    MetricasModule,
   ],
   controllers: [],
   providers: [],
