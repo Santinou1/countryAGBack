@@ -6,6 +6,7 @@ import { UserRole } from './entities/user-role.enum';
 import { LoggingService } from '../../logging/logging.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateRoleDto } from './dto/update-role.dto';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -193,5 +194,23 @@ export class UsersService implements OnModuleInit {
     );
 
     return user;
+  }
+
+  async updateRole(id: number, updateRoleDto: UpdateRoleDto): Promise<User> {
+    this.logger.log(
+      `Actualizando rol del usuario con ID: ${id} a ${updateRoleDto.rol}`,
+      'UsersService',
+    );
+
+    // Verificar que el usuario existe
+    await this.findOne(id);
+
+    await this.usersRepository.update(id, { rol: updateRoleDto.rol });
+    const updatedUser = await this.findOne(id);
+    this.logger.log(
+      `Rol del usuario actualizado exitosamente: ${id} -> ${updateRoleDto.rol}`,
+      'UsersService',
+    );
+    return updatedUser;
   }
 }
