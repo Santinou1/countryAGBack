@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not, IsNull } from 'typeorm';
-import { Boleto, EstadoBoleto } from './entities/boleto.entity';
+import { Boleto, EstadoBoleto, TipoBoleto } from './entities/boleto.entity';
 import { LoggingService } from '../../logging/logging.service';
 import { UsersService } from '../users/users.service';
 import { v4 as uuidv4 } from 'uuid';
@@ -39,7 +39,7 @@ export class BoletosService {
     return codigo;
   }
 
-  async crearBoletoParaLote(userId: number, lote: string): Promise<Boleto> {
+  async crearBoletoParaLote(userId: number, lote: string, tipo: 'diario' | 'unico' = 'diario'): Promise<Boleto> {
     // Verificar que el usuario existe
     await this.usersService.findOne(userId);
 
@@ -55,10 +55,11 @@ export class BoletosService {
       contador: 0,
       activo: true,
       qrActivo: false,
+      tipo: tipo === 'unico' ? TipoBoleto.UNICO : TipoBoleto.DIARIO,
     });
 
     this.logger.log(
-      `Creando nuevo boleto para usuario ${userId} en lote ${lote} con código: ${codigoBoleto}`,
+      `Creando nuevo boleto para usuario ${userId} en lote ${lote} con código: ${codigoBoleto} y tipo: ${tipo}`,
       'BoletosService',
     );
     return this.boletosRepository.save(nuevoBoleto);

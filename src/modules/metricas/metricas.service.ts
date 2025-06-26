@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
-import { Boleto, EstadoBoleto } from '../boletos/entities/boleto.entity';
+import { Boleto, EstadoBoleto, TipoBoleto } from '../boletos/entities/boleto.entity';
 import { User } from '../users/entities/user.entity';
 import { LoggingService } from '../../logging/logging.service';
 import {
@@ -12,6 +12,7 @@ import {
   MetricasTopUsuarios,
   MetricasUso,
   MetricasCompletas,
+  MetricasPorTipo,
 } from './dto/metricas.dto';
 
 @Injectable()
@@ -29,13 +30,14 @@ export class MetricasService {
   async obtenerMetricasCompletas(): Promise<MetricasCompletas> {
     this.logger.log('Obteniendo métricas completas', 'MetricasService');
 
-    const [generales, porEstado, porLote, porPeriodo, topUsuarios, uso] = await Promise.all([
+    const [generales, porEstado, porLote, porPeriodo, topUsuarios, uso, porTipo] = await Promise.all([
       this.obtenerMetricasGenerales(),
       this.obtenerMetricasPorEstado(),
       this.obtenerMetricasPorLote(),
       this.obtenerMetricasPorPeriodo(),
       this.obtenerTopUsuarios(),
       this.obtenerMetricasUso(),
+      this.obtenerMetricasPorTipo(),
     ]);
 
     return {
@@ -45,6 +47,7 @@ export class MetricasService {
       porPeriodo,
       topUsuarios,
       uso,
+      porTipo,
     };
   }
 
@@ -235,6 +238,36 @@ export class MetricasService {
       porcentajeSinUso: Math.round(porcentajeSinUso * 100) / 100,
       porcentajeConUso: Math.round(porcentajeConUso * 100) / 100,
     };
+  }
+
+  async obtenerMetricasPorTipo(): Promise<MetricasPorTipo[]> {
+    const tipos: TipoBoleto[] = [TipoBoleto.DIARIO, TipoBoleto.UNICO];
+    const results: MetricasPorTipo[] = [];
+    for (const tipo of tipos) {
+      const [total, aprobados, usos, usados] = await Promise.all([
+        this.boletosRepository.count({ where: { tipo } }),
+        this.boletosRepository.count({ where: { tipo, estado: EstadoBoleto.APROBADO } }),
+        this.boletosRepository
+          .createQueryBuilder('boleto')
+          .select('SUM(boleto.contador)', 'total')
+          .where('boleto.tipo = :tipo', { tipo })
+          .getRawOne(),
+        this.boletosRepository.count({ where: { tipo, contador: MoreThanOrEqual(1) } }),
+      ]);
+      const ingresos = aprobados * this.PRECIO_BOLETO;
+      const promedioUsos = total > 0 ? (usos?.total || 0) / total : 0;
+      const tasaUso = total > 0 ? (usados / total) * 100 : 0;
+      results.push({
+        tipo: tipo as 'diario' | 'unico',
+        total,
+        aprobados,
+        ingresos,
+        usos: usos?.total || 0,
+        promedioUsos: Math.round(promedioUsos * 100) / 100,
+        tasaUso: Math.round(tasaUso * 100) / 100,
+      });
+    }
+    return results;
   }
 
   async obtenerMetricasResumidas() {

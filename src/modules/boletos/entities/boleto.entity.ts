@@ -8,6 +8,11 @@ export enum EstadoBoleto {
   RECHAZADO = 'rechazado',
 }
 
+export enum TipoBoleto {
+  DIARIO = 'diario',
+  UNICO = 'unico',
+}
+
 @Entity('boletos')
 export class Boleto {
   @PrimaryGeneratedColumn({ name: 'id' })
@@ -48,6 +53,14 @@ export class Boleto {
   @Column({ name: 'qr_valido_hasta', type: 'timestamp', nullable: true })
   qrValidoHasta: Date | null;
 
+  @Column({
+    name: 'tipo',
+    type: 'enum',
+    enum: TipoBoleto,
+    default: TipoBoleto.DIARIO,
+  })
+  tipo: TipoBoleto;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
 
@@ -59,6 +72,11 @@ export class Boleto {
   isValido(): boolean {
     if (!this.activo || this.estado !== EstadoBoleto.APROBADO) {
       return false;
+    }
+
+    if (this.tipo === TipoBoleto.UNICO) {
+      // Solo permite un uso
+      return this.contador < 1;
     }
 
     // Si no se ha usado por primera vez, está válido

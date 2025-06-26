@@ -25,7 +25,7 @@ export class MercadoPagoService {
     });
   }
 
-  async createPaymentPreference(payer: { email: string }) {
+  async createPaymentPreference(payer: { email: string }, tipo: 'diario' | 'unico' = 'diario') {
     // Log de todas las variables de entorno para depuración
     //this.logger.log('Variables de entorno actuales:', process.env);
 
@@ -42,14 +42,22 @@ export class MercadoPagoService {
     const nuevoBoleto = await this.boletosService.crearBoletoParaLote(
       user.id,
       lote,
+      tipo,
     );
 
-    const defaultItem = {
-      id: 'BOLETO-DIARIO',
-      title: 'Boleto Diario San Sebastian',
-      quantity: 1,
-      unit_price: 1, // Recuerda cambiar esto a 7000 cuando termines las pruebas
-    };
+    const defaultItem = tipo === 'unico'
+      ? {
+          id: 'BOLETO-UNICO',
+          title: 'Boleto Único San Sebastian',
+          quantity: 1,
+          unit_price: 1, // Cambiar a 5000 o el precio real del boleto único
+        }
+      : {
+          id: 'BOLETO-DIARIO',
+          title: 'Boleto Diario San Sebastian',
+          quantity: 1,
+          unit_price: 1, // Cambiar a 7000 o el precio real del boleto diario
+        };
 
     const result = await preference.create({
       body: {

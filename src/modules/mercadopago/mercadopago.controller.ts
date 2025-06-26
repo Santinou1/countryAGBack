@@ -27,9 +27,10 @@ export class MercadoPagoController {
   }
 
   @Post('create-preference')
-  async createPreference(@Body() body: { payer: any }) {
+  async createPreference(@Body() body: { payer: any, tipo?: 'diario' | 'unico' }) {
     return this.mercadoPagoService.createPaymentPreference(
       body.payer,
+      body.tipo || 'diario',
     );
   }
 } 

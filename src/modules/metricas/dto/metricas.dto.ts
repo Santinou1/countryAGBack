@@ -51,6 +51,16 @@ export interface MetricasUso {
   porcentajeConUso: number;
 }
 
+export interface MetricasPorTipo {
+  tipo: 'diario' | 'unico';
+  total: number;
+  aprobados: number;
+  ingresos: number;
+  usos: number;
+  promedioUsos: number;
+  tasaUso: number;
+}
+
 export interface MetricasCompletas {
   generales: MetricasGenerales;
   porEstado: MetricasPorEstado;
@@ -58,4 +68,5 @@ export interface MetricasCompletas {
   porPeriodo: MetricasPorPeriodo[];
   topUsuarios: MetricasTopUsuarios[];
   uso: MetricasUso;
+  porTipo: MetricasPorTipo[];
 }
