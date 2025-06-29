@@ -50,13 +50,13 @@ export class MercadoPagoService {
           id: 'BOLETO-UNICO',
           title: 'Boleto Único San Sebastian',
           quantity: 1,
-          unit_price: 1, // Cambiar a 5000 o el precio real del boleto único
+          unit_price: 3000, // Precio actualizado del boleto único
         }
       : {
           id: 'BOLETO-DIARIO',
           title: 'Boleto Diario San Sebastian',
           quantity: 1,
-          unit_price: 1, // Cambiar a 7000 o el precio real del boleto diario
+          unit_price: 6000, // Precio actualizado del boleto diario
         };
 
     const result = await preference.create({
