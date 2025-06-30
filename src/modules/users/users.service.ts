@@ -104,11 +104,22 @@ export class UsersService implements OnModuleInit {
     const existingUser = await this.usersRepository.findOne({
       where: { email: createUserDto.email },
     });
-
     if (existingUser) {
       const errorMessage = `Ya existe un usuario con el email ${createUserDto.email}`;
       this.logger.error(errorMessage, undefined, 'UsersService');
       throw new BadRequestException(errorMessage);
+    }
+
+    // Verificar si el DNI ya existe
+    if (createUserDto.dni) {
+      const existingDni = await this.usersRepository.findOne({
+        where: { dni: createUserDto.dni },
+      });
+      if (existingDni) {
+        const errorMessage = `Ya existe un usuario con el DNI ${createUserDto.dni}`;
+        this.logger.error(errorMessage, undefined, 'UsersService');
+        throw new BadRequestException(errorMessage);
+      }
     }
 
     const newUser = this.usersRepository.create({
