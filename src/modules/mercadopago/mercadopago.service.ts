@@ -49,7 +49,7 @@ export class MercadoPagoService {
       id: 'BOLETO-UNICO',
       title: 'Boleto Único San Sebastian',
       quantity: 1,
-      unit_price: 1, // Precio actualizado del boleto único
+      unit_price: 2500, // Precio actualizado del boleto único
     };
 
     const result = await preference.create({
@@ -132,7 +132,7 @@ export class MercadoPagoService {
       id: 'BOLETO-UNICO',
       title: `Boleto Único para DNI ${dni}`,
       quantity: 1,
-      unit_price: 1,
+      unit_price: 2500,
     };
     const result = await preference.create({
       body: {
