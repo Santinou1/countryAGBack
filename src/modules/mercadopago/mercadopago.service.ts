@@ -54,7 +54,7 @@ export class MercadoPagoService {
       id: 'BOLETO-UNICO',
       title: 'Boleto Único San Sebastian',
       quantity: cantidad,
-      unit_price: 2500, // Precio actualizado del boleto único
+      unit_price: 1, // Precio actualizado del boleto único
     };
 
     const result = await preference.create({
@@ -67,7 +67,7 @@ export class MercadoPagoService {
           pending: `https://transporteenpunto.com.ar/home?payment_status=pending`,
         },
         notification_url: `https://transporteenpunto.com.ar/api/mercadopago/webhook`,
-        external_reference: boletos[0].id.toString(),
+        external_reference: boletos.map(b => b.id).join(','),
       },
     });
 
@@ -79,32 +79,30 @@ export class MercadoPagoService {
 
     try {
       const payment = await new Payment(this.client).get({ id: paymentId });
-      const boletoId = payment.external_reference;
+      const boletoIds = payment.external_reference;
 
-      if (!boletoId) {
-        this.logger.error(`External reference (boletoId) not found for payment ID ${paymentId}`);
+      if (!boletoIds) {
+        this.logger.error(`External reference (boletoIds) not found for payment ID ${paymentId}`);
         return;
       }
       
       if (payment && payment.status === 'approved') {
-        this.logger.log(`Payment ID ${paymentId} for Boleto ID ${boletoId} was approved.`);
+        this.logger.log(`Payment ID ${paymentId} for Boleto IDs ${boletoIds} was approved.`);
 
-        const boleto = await this.boletosService.getBoletoById(parseInt(boletoId, 10));
-
-        if (!boleto) {
-          this.logger.error(`Boleto with ID ${boletoId} not found.`);
-          return;
+        // Aprobar todos los boletos referenciados
+        const ids = boletoIds.split(',').map((id: string) => parseInt(id, 10)).filter(Boolean);
+        for (const boletoId of ids) {
+          const boleto = await this.boletosService.getBoletoById(boletoId);
+          if (!boleto) {
+            this.logger.error(`Boleto with ID ${boletoId} not found.`);
+            continue;
+          }
+          await this.boletosService.aprobarBoleto(boleto.idUsers, boleto.id);
+          this.logger.log(`Boleto ${boleto.id} was successfully approved for user ${boleto.idUsers}.`);
         }
-
-        // Se asume que el boleto fue creado por el usuario correcto, así que podemos usar un ID de "sistema" o el del propietario para aprobar.
-        await this.boletosService.aprobarBoleto(boleto.idUsers, boleto.id);
-
-        this.logger.log(
-          `Boleto ${boleto.id} was successfully approved for user ${boleto.idUsers}.`,
-        );
       } else {
         this.logger.log(
-          `Payment ID ${paymentId} for Boleto ID ${boletoId} not approved. Status: ${payment?.status}`,
+          `Payment ID ${paymentId} for Boleto IDs ${boletoIds} not approved. Status: ${payment?.status}`,
         );
       }
     } catch (error) {
@@ -141,7 +139,7 @@ export class MercadoPagoService {
       id: 'BOLETO-UNICO',
       title: `Boleto Único para DNI ${dni}`,
       quantity: cantidad,
-      unit_price: 2500,
+      unit_price: 1,
     };
     const result = await preference.create({
       body: {
@@ -153,7 +151,7 @@ export class MercadoPagoService {
           pending: `https://transporteenpunto.com.ar/home?payment_status=pending`,
         },
         notification_url: `https://transporteenpunto.com.ar/api/mercadopago/webhook`,
-        external_reference: boletos[0].id.toString(),
+        external_reference: boletos.map(b => b.id).join(','),
       },
     });
     return result;
