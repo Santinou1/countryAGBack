@@ -45,19 +45,12 @@ export class MercadoPagoService {
       tipo,
     );
 
-    const defaultItem = tipo === 'unico'
-      ? {
-          id: 'BOLETO-UNICO',
-          title: 'Boleto Único San Sebastian',
-          quantity: 1,
-          unit_price: 3000, // Precio actualizado del boleto único
-        }
-      : {
-          id: 'BOLETO-DIARIO',
-          title: 'Boleto Diario San Sebastian',
-          quantity: 1,
-          unit_price: 6000, // Precio actualizado del boleto diario
-        };
+    const defaultItem = {
+      id: 'BOLETO-UNICO',
+      title: 'Boleto Único San Sebastian',
+      quantity: 1,
+      unit_price: 2500, // Precio actualizado del boleto único
+    };
 
     const result = await preference.create({
       body: {
