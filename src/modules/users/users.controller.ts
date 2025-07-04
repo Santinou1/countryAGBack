@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
@@ -76,5 +77,17 @@ export class UsersController {
   @Roles(UserRole.ADMIN)
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.usersService.remove(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('search')
+  async searchUsers(@Query('q') q: string): Promise<User[]> {
+    return this.usersService.searchByDniOrName(q);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('by-dni/:dni')
+  async getByDni(@Param('dni') dni: string) {
+    return this.usersService.findByDni(dni);
   }
 }

@@ -7,6 +7,7 @@ import { LoggingService } from '../../logging/logging.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { ILike } from 'typeorm';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -223,5 +224,29 @@ export class UsersService implements OnModuleInit {
       'UsersService',
     );
     return updatedUser;
+  }
+
+  async findByDni(dni: string): Promise<User> {
+    this.logger.log(`Buscando usuario por DNI: ${dni}`, 'UsersService');
+    const user = await this.usersRepository.findOne({ where: { dni } });
+    if (!user) {
+      this.logger.error(`Usuario con DNI ${dni} no encontrado`, undefined, 'UsersService');
+      throw new NotFoundException(`Usuario con DNI ${dni} no encontrado`);
+    }
+    return user;
+  }
+
+  async searchByDniOrName(q: string): Promise<User[]> {
+    if (!q || q.trim().length < 2) return [];
+    const query = q.trim();
+    return this.usersRepository.find({
+      where: [
+        { dni: ILike(`%${query}%`) },
+        { nombre: ILike(`%${query}%`) },
+        { apellido: ILike(`%${query}%`) },
+      ],
+      take: 10,
+      order: { apellido: 'ASC', nombre: 'ASC' },
+    });
   }
 }
