@@ -49,7 +49,7 @@ export class MercadoPagoService {
       id: 'BOLETO-UNICO',
       title: 'Boleto Único San Sebastian',
       quantity: 1,
-      unit_price: 2500, // Precio actualizado del boleto único
+      unit_price: 1, // Precio actualizado del boleto único
     };
 
     const result = await preference.create({
@@ -108,5 +108,45 @@ export class MercadoPagoService {
         error.stack,
       );
     }
+  }
+
+  async createPaymentPreferenceForOther(payer: { email: string }, dni: string) {
+    // 1. Buscar usuario por DNI
+    const user = await this.usersService.findByDni(dni);
+    if (!user) {
+      throw new Error(`Usuario con DNI ${dni} no encontrado.`);
+    }
+
+    // 2. Crear boleto pendiente para el usuario destinatario
+    const lote = 'PAGO_ONLINE';
+    const tipo = 'unico';
+    const nuevoBoleto = await this.boletosService.crearBoletoParaLote(
+      user.id,
+      lote,
+      tipo,
+    );
+
+    // 3. Crear preferencia de pago para el pagador
+    const preference = new Preference(this.client);
+    const defaultItem = {
+      id: 'BOLETO-UNICO',
+      title: `Boleto Único para DNI ${dni}`,
+      quantity: 1,
+      unit_price: 1,
+    };
+    const result = await preference.create({
+      body: {
+        items: [defaultItem],
+        payer,
+        back_urls: {
+          success: `https://transporteenpunto.com.ar/home?payment_status=success`,
+          failure: `https://transporteenpunto.com.ar/home?payment_status=failure`,
+          pending: `https://transporteenpunto.com.ar/home?payment_status=pending`,
+        },
+        notification_url: `https://transporteenpunto.com.ar/api/mercadopago/webhook`,
+        external_reference: nuevoBoleto.id.toString(),
+      },
+    });
+    return result;
   }
 } 

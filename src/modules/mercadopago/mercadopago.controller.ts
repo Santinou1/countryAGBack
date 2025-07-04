@@ -33,4 +33,12 @@ export class MercadoPagoController {
       body.tipo || 'diario',
     );
   }
+
+  @Post('comprar-para-otro')
+  async comprarParaOtro(@Body() body: { payer: any, dni: string }) {
+    return this.mercadoPagoService.createPaymentPreferenceForOther(
+      body.payer,
+      body.dni,
+    );
+  }
 } 
