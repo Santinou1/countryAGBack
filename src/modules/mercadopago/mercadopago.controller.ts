@@ -27,18 +27,20 @@ export class MercadoPagoController {
   }
 
   @Post('create-preference')
-  async createPreference(@Body() body: { payer: any, tipo?: 'diario' | 'unico' }) {
+  async createPreference(@Body() body: { payer: any, tipo?: 'diario' | 'unico', cantidad?: number }) {
     return this.mercadoPagoService.createPaymentPreference(
       body.payer,
       body.tipo || 'diario',
+      body.cantidad || 1,
     );
   }
 
   @Post('comprar-para-otro')
-  async comprarParaOtro(@Body() body: { payer: any, dni: string }) {
+  async comprarParaOtro(@Body() body: { payer: any, dni: string, cantidad?: number }) {
     return this.mercadoPagoService.createPaymentPreferenceForOther(
       body.payer,
       body.dni,
+      body.cantidad || 1,
     );
   }
 } 

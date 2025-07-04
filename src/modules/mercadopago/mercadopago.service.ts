@@ -25,7 +25,7 @@ export class MercadoPagoService {
     });
   }
 
-  async createPaymentPreference(payer: { email: string }, tipo: 'diario' | 'unico' = 'diario') {
+  async createPaymentPreference(payer: { email: string }, tipo: 'diario' | 'unico' = 'diario', cantidad: number = 1) {
     // Log de todas las variables de entorno para depuración
     //this.logger.log('Variables de entorno actuales:', process.env);
 
@@ -37,19 +37,24 @@ export class MercadoPagoService {
       throw new Error(`Usuario con email ${payer.email} no encontrado.`);
     }
 
-    // 2. Crear boleto pendiente
+    // 2. Crear boletos pendientes
     const lote = 'PAGO_ONLINE';
-    const nuevoBoleto = await this.boletosService.crearBoletoParaLote(
-      user.id,
-      lote,
-      tipo,
-    );
+    const boletos: any[] = [];
+    for (let i = 0; i < cantidad; i++) {
+      const nuevoBoleto = await this.boletosService.crearBoletoParaLote(
+        user.id,
+        lote,
+        tipo,
+      );
+      boletos.push(nuevoBoleto);
+    }
 
+    // Usar el primer boleto como referencia
     const defaultItem = {
       id: 'BOLETO-UNICO',
       title: 'Boleto Único San Sebastian',
-      quantity: 1,
-      unit_price: 2500, // Precio actualizado del boleto único
+      quantity: cantidad,
+      unit_price: 1, // Precio actualizado del boleto único
     };
 
     const result = await preference.create({
@@ -62,7 +67,7 @@ export class MercadoPagoService {
           pending: `https://transporteenpunto.com.ar/home?payment_status=pending`,
         },
         notification_url: `https://transporteenpunto.com.ar/api/mercadopago/webhook`,
-        external_reference: nuevoBoleto.id.toString(), // 3. Enviar ID del boleto como referencia
+        external_reference: boletos[0].id.toString(),
       },
     });
 
@@ -110,29 +115,33 @@ export class MercadoPagoService {
     }
   }
 
-  async createPaymentPreferenceForOther(payer: { email: string }, dni: string) {
+  async createPaymentPreferenceForOther(payer: { email: string }, dni: string, cantidad: number = 1) {
     // 1. Buscar usuario por DNI
     const user = await this.usersService.findByDni(dni);
     if (!user) {
       throw new Error(`Usuario con DNI ${dni} no encontrado.`);
     }
 
-    // 2. Crear boleto pendiente para el usuario destinatario
+    // 2. Crear boletos pendientes para el usuario destinatario
     const lote = 'PAGO_ONLINE';
     const tipo = 'unico';
-    const nuevoBoleto = await this.boletosService.crearBoletoParaLote(
-      user.id,
-      lote,
-      tipo,
-    );
+    const boletos: any[] = [];
+    for (let i = 0; i < cantidad; i++) {
+      const nuevoBoleto = await this.boletosService.crearBoletoParaLote(
+        user.id,
+        lote,
+        tipo,
+      );
+      boletos.push(nuevoBoleto);
+    }
 
     // 3. Crear preferencia de pago para el pagador
     const preference = new Preference(this.client);
     const defaultItem = {
       id: 'BOLETO-UNICO',
       title: `Boleto Único para DNI ${dni}`,
-      quantity: 1,
-      unit_price: 2500,
+      quantity: cantidad,
+      unit_price: 1,
     };
     const result = await preference.create({
       body: {
@@ -144,7 +153,7 @@ export class MercadoPagoService {
           pending: `https://transporteenpunto.com.ar/home?payment_status=pending`,
         },
         notification_url: `https://transporteenpunto.com.ar/api/mercadopago/webhook`,
-        external_reference: nuevoBoleto.id.toString(),
+        external_reference: boletos[0].id.toString(),
       },
     });
     return result;
