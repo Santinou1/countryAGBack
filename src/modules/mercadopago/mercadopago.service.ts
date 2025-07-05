@@ -156,4 +156,50 @@ export class MercadoPagoService {
     });
     return result;
   }
+
+  async comprarPack(payer: { email: string }, packType: '10' | '20' | '40', dni?: string) {
+    // Definir cantidad y precio por pack
+    const cantidad = packType === '10' ? 10 : packType === '20' ? 20 : 40;
+    const precioPorBoleto = 2000;
+    let user;
+    if (dni) {
+      user = await this.usersService.findByDni(dni);
+      if (!user) throw new Error(`Usuario con DNI ${dni} no encontrado.`);
+    } else {
+      user = await this.usersService.findByEmail(payer.email);
+      if (!user) throw new Error(`Usuario con email ${payer.email} no encontrado.`);
+    }
+    const lote = 'PAGO_ONLINE';
+    const tipo = 'unico';
+    const boletos: any[] = [];
+    for (let i = 0; i < cantidad; i++) {
+      const nuevoBoleto = await this.boletosService.crearBoletoParaLote(
+        user.id,
+        lote,
+        tipo,
+      );
+      boletos.push(nuevoBoleto);
+    }
+    const preference = new Preference(this.client);
+    const defaultItem = {
+      id: `PACK-${packType}-VIAJES`,
+      title: `Pack ${packType} viajes` + (dni ? ` para DNI ${dni}` : ''),
+      quantity: 1,
+      unit_price: precioPorBoleto * cantidad,
+    };
+    const result = await preference.create({
+      body: {
+        items: [defaultItem],
+        payer,
+        back_urls: {
+          success: `https://transporteenpunto.com.ar/home?payment_status=success`,
+          failure: `https://transporteenpunto.com.ar/home?payment_status=failure`,
+          pending: `https://transporteenpunto.com.ar/home?payment_status=pending`,
+        },
+        notification_url: `https://transporteenpunto.com.ar/api/mercadopago/webhook`,
+        external_reference: boletos.map(b => b.id).join(','),
+      },
+    });
+    return result;
+  }
 } 

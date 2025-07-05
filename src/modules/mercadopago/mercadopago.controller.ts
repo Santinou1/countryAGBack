@@ -43,4 +43,13 @@ export class MercadoPagoController {
       body.cantidad || 1,
     );
   }
+
+  @Post('comprar-pack')
+  async comprarPack(@Body() body: { payer: any, packType: '10' | '20' | '40', dni?: string }) {
+    return this.mercadoPagoService.comprarPack(
+      body.payer,
+      body.packType,
+      body.dni,
+    );
+  }
 } 
