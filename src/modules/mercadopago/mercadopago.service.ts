@@ -54,7 +54,7 @@ export class MercadoPagoService {
       id: 'BOLETO-UNICO',
       title: 'Boleto Único San Sebastian',
       quantity: cantidad,
-      unit_price: 1, // Precio de prueba
+      unit_price: 2500, // Precio de prueba
     };
 
     const result = await preference.create({
@@ -139,7 +139,7 @@ export class MercadoPagoService {
       id: 'BOLETO-UNICO',
       title: `Boleto Único para DNI ${dni}`,
       quantity: cantidad,
-      unit_price: 1,
+      unit_price: 2500,
     };
     const result = await preference.create({
       body: {
@@ -160,7 +160,7 @@ export class MercadoPagoService {
   async comprarPack(payer: { email: string }, packType: '10' | '20' | '40', dni?: string) {
     // Definir cantidad y precio por pack
     const cantidad = packType === '10' ? 10 : packType === '20' ? 20 : 40;
-    const precioPorBoleto = 1;
+    const precioPorBoleto = 2000;
     let user;
     if (dni) {
       user = await this.usersService.findByDni(dni);
