@@ -15,8 +15,8 @@ export class User {
     @Column({ name: 'Email', unique: true })
     email: string;
 
-    @Column({ name: 'Contraseña' })
-    contraseña: string;
+    @Column({ name: 'Contraseña', type: 'varchar', nullable: true })
+    contraseña: string | null;
 
     @Column({
         name: 'Rol',

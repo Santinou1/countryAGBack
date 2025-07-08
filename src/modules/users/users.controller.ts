@@ -90,4 +90,11 @@ export class UsersController {
   async getByDni(@Param('dni') dni: string) {
     return this.usersService.findByDni(dni);
   }
+
+  @Put(':id/blank-password')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async blankPassword(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    return this.usersService.blankPassword(id);
+  }
 }

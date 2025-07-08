@@ -249,4 +249,13 @@ export class UsersService implements OnModuleInit {
       order: { apellido: 'ASC', nombre: 'ASC' },
     });
   }
+
+  async blankPassword(id: number): Promise<User> {
+    const user = await this.findOne(id);
+    this.logger.log(`El administrador blanqueó la contraseña del usuario con ID: ${id}, email: ${user.email}`, 'UsersService');
+    user.contraseña = null;
+    await this.usersRepository.save(user);
+    this.logger.log(`Contraseña blanqueada para el usuario con ID: ${id}, email: ${user.email}`, 'UsersService');
+    return user;
+  }
 }
